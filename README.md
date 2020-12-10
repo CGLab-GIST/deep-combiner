@@ -2,7 +2,7 @@
 
 [Jonghee Back](https://cglab.gist.ac.kr/people/), [Binh-Son Hua](https://sonhua.github.io/), [Toshiya Hachisuka](https://cs.uwaterloo.ca/~thachisu/), [Bochang Moon](https://cglab.gist.ac.kr/people/bochang.html)
 
-![teaser](representative_image.png = "Deep Combiner for Independent and Correlated Pixel Estimates")
+![Teaser](representative_image.png)
 
 ## Overview
 This code is the implementation of the method demonstrated in the paper [Deep Combiner for Independent and Correlated Pixel Estimates](https://cglab.gist.ac.kr/publications/2020_Deep_Combiner_for_Independent_and_Correlated_Pixel_Estimates.html).
@@ -71,7 +71,7 @@ After you download the attached sample data, please move `__test_scenes__` folde
 
 ## License
 
-All source codes are released under a BSD License. Please refer to [our license file](https://) for more detail.
+All source codes are released under a BSD License. Please refer to [our license file](https://github.com/CGLab-GIST/deep-combiner/blob/master/license) for more detail.
 
 
 ## Citation
