@@ -7,6 +7,10 @@ import exr as exr
 import tensorflow as tf
 import config as conf
 
+import itertools
+import multiprocessing
+from multiprocessing import Pool
+from functools import partial
 
 def _bytes_feature(value):
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
@@ -141,39 +145,46 @@ def readOneFrame(framePath, targetFramePath, typeCombiner):
     return dataList
 
 
+def generate(train_input_dir, train_target_dir, train_dataset_dir, tfrecord_filename, type_combiner, totalFrame, permIdxSet, item):
+    fileIdx = item[0] * totalFrame
+    spp = item[1][0]
+    corrMethod = item[1][1]
+    scene = item[1][2]
+
+    strPathInput = os.path.join(train_input_dir, scene + '_' + corrMethod + '_' + spp)
+    print(strPathInput)
+    strPathTarget = os.path.join(train_target_dir, scene)
+
+    for fIdx in range(0, totalFrame):
+        frameIdx = permIdxSet[fIdx]
+        strFileIdx = '{0:03d}'.format(fileIdx)
+        strFrameIdx = '{0:03d}'.format(frameIdx)
+        setPathInput = [fn for fn in sorted(glob.glob(os.path.join(strPathInput, strFrameIdx + '*.exr')))]
+        if len(setPathInput) == 0:
+            print("[image_io.py] Not found dataset at frame index %d from %s scene. Skip it" % (frameIdx, scene))
+            continue
+
+        print("[image_io.py] %d-th... Working on frame index %d in %s, (%s spp, %s)..." % (fileIdx, frameIdx, scene, spp, corrMethod))
+        strPathOutput = os.path.join(train_dataset_dir, tfrecord_filename + strFileIdx + '.tfrecord')
+        writer = tf.python_io.TFRecordWriter(strPathOutput)
+        currInputFramePath = os.path.join(strPathInput, strFrameIdx)
+        currTargetFramePath = os.path.join(strPathTarget, strFrameIdx)
+        data = readOneFrame(currInputFramePath, currTargetFramePath, type_combiner)
+        writeTFRecord(data, writer)
+        writer.close()
+        fileIdx += 1
+
+
 def generateTrainingData(FLAGS):
     if not os.path.exists(FLAGS.train_dataset_dir):
         os.makedirs(FLAGS.train_dataset_dir)
 
-    fileIdx = 0
     totalFrame = 20
     permIdxSet = np.random.permutation(totalFrame)
 
-    for spp in FLAGS.train_spps:
-        for corrMethod in FLAGS.train_corr_methods:
-            for scene in FLAGS.train_scenes:
-                strPathInput = os.path.join(FLAGS.train_input_dir, scene + '_' + corrMethod + '_' + spp)
-                strPathTarget = os.path.join(FLAGS.train_target_dir, scene)
+    items = list(itertools.product(FLAGS.train_spps, FLAGS.train_corr_methods, FLAGS.train_scenes))
 
-                for fIdx in range(0, totalFrame):
-                    frameIdx = permIdxSet[fIdx]
-                    strFileIdx = '{0:03d}'.format(fileIdx)
-                    strFrameIdx = '{0:03d}'.format(frameIdx)
-                    setPathInput = [fn for fn in sorted(glob.glob(os.path.join(strPathInput, strFrameIdx + '*.exr')))]
-                    if len(setPathInput) == 0:
-                        print("[image_io.py] Not found dataset at frame index %d from %s scene. Skip it" % (frameIdx, scene))
-                        continue
+    with Pool(multiprocessing.cpu_count()) as p:
+        p.map(partial(generate, FLAGS.train_input_dir, FLAGS.train_target_dir, FLAGS.train_dataset_dir, FLAGS.tfrecord_filename, FLAGS.type_combiner, totalFrame, permIdxSet), enumerate(items))
 
-                    print("[image_io.py] %d-th... Working on frame index %d in %s, (%s spp, %s)..." % (fileIdx, frameIdx, scene, spp, corrMethod))
-                    strPathOutput = os.path.join(FLAGS.train_dataset_dir, FLAGS.tfrecord_filename + strFileIdx + '.tfrecord')
-                    writer = tf.python_io.TFRecordWriter(strPathOutput)
-                    currInputFramePath = os.path.join(strPathInput, strFrameIdx)
-                    currTargetFramePath = os.path.join(strPathTarget, strFrameIdx)
-                    data = readOneFrame(currInputFramePath, currTargetFramePath, FLAGS.type_combiner)
-                    writeTFRecord(data, writer)
-                    writer.close()
-                    fileIdx += 1
-
-
-    print("[image_io.py] Total %d frames are used in dataset!" % (fileIdx))
-
+    print("[image_io.py] Total %d frames are used in dataset!" % (len(items) * totalFrame))
