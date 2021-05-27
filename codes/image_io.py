@@ -37,7 +37,7 @@ def readTFRecord(fileDir, fileName, batchSize=8, numEpoch=200):
     # randomness for reading tfrecord
     np.random.seed(42)
     pIdxSet = np.random.permutation(len(recordSet))
-    copiedRecordSet = recordSet
+    copiedRecordSet = recordSet.copy()
     for pIdx in range(len(recordSet)):
         copiedRecordSet[pIdx] = recordSet[pIdxSet[pIdx]]
 
