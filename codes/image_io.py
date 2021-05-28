@@ -30,6 +30,18 @@ def parse_single_example(serialized_item):
     x_r = tf.reshape(tf.decode_raw(example.get('x_rand'), tf.float32), [conf.FLAGS.image_h, conf.FLAGS.image_w, conf.FLAGS.color_channel])
     y_ref = tf.reshape(tf.decode_raw(example.get('y_ref'), tf.float32), [conf.FLAGS.image_h, conf.FLAGS.image_w, conf.FLAGS.color_channel])
 
+    width = conf.FLAGS.image_w
+    height = conf.FLAGS.image_h
+
+    x_f = tf.reshape(tf.decode_raw(example.get('x_feat'), tf.float32), [width, height, 31]) # # of input channel of multi buffer
+    x_c = tf.reshape(tf.decode_raw(example.get('x_corr'), tf.float32), [width, height, conf.FLAGS.color_channel])
+    x_r = tf.reshape(tf.decode_raw(example.get('x_rand'), tf.float32), [width, height, conf.FLAGS.color_channel])
+    # Change multi to single (feature)
+    if conf.FLAGS.type_combiner == conf.TYPE_SINGLE_BUFFER:
+        *_, normal, texture, depth = tf.split(x_f, [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 1], axis=-1)
+        x_f = tf.concat([x_c, x_r, normal, texture, depth], axis=2)
+    y_ref = tf.reshape(tf.decode_raw(example.get('y_ref'), tf.float32), [width, height, conf.FLAGS.color_channel])
+
     data_dic = {'x_feat': x_f, 'x_corr': x_c, 'x_rand': x_r, 'y_ref': y_ref}
 
     return dict(data_dic)
