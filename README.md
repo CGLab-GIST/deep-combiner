@@ -8,8 +8,11 @@
 This code is the implementation of the method demonstrated in the paper [Deep Combiner for Independent and Correlated Pixel Estimates](https://cglab.gist.ac.kr/publications/2020_Deep_Combiner_for_Independent_and_Correlated_Pixel_Estimates.html).
 For more details, please refer to a [project page](https://cglab.gist.ac.kr/publications/2020_Deep_Combiner_for_Independent_and_Correlated_Pixel_Estimates.html).
 
-The code is implemented on Ubuntu 16.04 with TensorFlow 1.13.2, Python 3.5 and CUDA 10.0.
-Furthermore, the code is tested on Ubuntu 16.04, 18.04 and 20.04. We tested the code on Nvidia graphics card with compute capability 6.1 and 7.5 (e.g., Nvidia GeForce GTX 1080, GTX 1080 Ti, RTX 2080 Ti and Quadro RTX 8000 Graphics cards). It is recommended to use a graphics card with 10GB or more for training and testing the provided codes with default setting.
+The code on this branch is a migrated version of the method for TensorFlow 1 to TensorFlow 2.5.
+The major change is to add some codes for migration and modify `Dockerfile` for Tensorflow 2.5, 
+and the neural network model and other functionalities are fundamentally same with the master branch.
+If the Nvidia graphics card with compute capability 8.6 (e.g., Nvidia RTX 30 series graphics cards) is used, it is recommended to use this code rather than the master branch.
+It is also recommended to use a graphics card with 10GB or more for training and testing the provided codes with default setting.
 
 If there is any problem, question or comment, feel free to contact us: **Jonghee Back** (jongheeback@gm.gist.ac.kr) 
 

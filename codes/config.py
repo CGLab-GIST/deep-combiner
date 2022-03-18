@@ -1,4 +1,5 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -110,7 +111,7 @@ tf.app.flags.DEFINE_string ('train_dataset_dir', FLAGS.data_dir + '__data_tfreco
                             'Directory for training dataset')
 tf.app.flags.DEFINE_string ('valid_dataset_dir', FLAGS.data_dir + '__valid_data_tfrecord__',
                             'Directory for training dataset')
-tf.app.flags.DEFINE_string ('log_dir', FLAGS.data_dir + '__train_log__',
+tf.app.flags.DEFINE_string ('logger_dir', FLAGS.data_dir + '__train_log__',
                             'Directory for log')
 tf.app.flags.DEFINE_string ('ckpt_dir', FLAGS.data_dir + '__train_ckpt__',
                             'Directory for checkpoint')

@@ -1,6 +1,6 @@
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from weighted_average import weighted_average
 
 def kpn_conv2d(x, filter_size, out_channel, is_training=False, name='conv', relu=True):
@@ -9,7 +9,7 @@ def kpn_conv2d(x, filter_size, out_channel, is_training=False, name='conv', relu
         in_channel = in_shape[-1]
         
         filter_shape = [filter_size, filter_size, in_channel, out_channel]
-        W = tf.get_variable(name='W', shape=filter_shape, dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer(), trainable=True)
+        W = tf.get_variable(name='W', shape=filter_shape, dtype=tf.float32, initializer=tf.keras.initializers.glorot_normal(), trainable=True)
         b = tf.get_variable(name='b', shape=[out_channel], dtype=tf.float32, initializer=tf.constant_initializer(0.0), trainable=True)
 
         res = tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME', name=name)

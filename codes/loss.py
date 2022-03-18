@@ -1,6 +1,6 @@
 
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 def L1(y, _y):
     print('loss : L1')

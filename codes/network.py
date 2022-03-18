@@ -3,7 +3,7 @@ import glob
 import time
 from datetime import datetime
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 
 import exr as exr
 import model as model
@@ -53,7 +53,7 @@ class Network:
 
         with tf.Session(config=tf_config) as sess:
             sess.run(tf.global_variables_initializer())
-            logger = Logger(sess, self.FLAGS.log_dir, self.FLAGS.ckpt_dir, reset=False)
+            logger = Logger(sess, self.FLAGS.logger_dir, self.FLAGS.ckpt_dir, reset=False)
             summary = logger.summary(self.loss)
             minValLoss = float("inf")
             
@@ -149,7 +149,7 @@ class Network:
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
         
-            logger = Logger(sess, self.FLAGS.log_dir, self.FLAGS.ckpt_dir, reset=False)
+            logger = Logger(sess, self.FLAGS.logger_dir, self.FLAGS.ckpt_dir, reset=False)
             logger.restore_ckpt(sess, self.FLAGS.test_ckpt_filename)
             
             METHODS = self.FLAGS.test_corr_methods
@@ -267,13 +267,13 @@ class Network:
 
 class Logger:
 
-    def __init__(self, sess, log_dir, ckpt_dir, train=True, reset=True):
-        self.log_dir = log_dir
+    def __init__(self, sess, logger_dir, ckpt_dir, train=True, reset=True):
+        self.logger_dir = logger_dir
         self.ckpt_dir = ckpt_dir
 
         self.ckpt_saver = tf.train.Saver()
         self.ckpt_opt_saver = tf.train.Saver()
-        self.train_logger = tf.summary.FileWriter(self.log_dir, sess.graph)
+        self.train_logger = tf.summary.FileWriter(self.logger_dir, sess.graph)
 
     def summary(self, loss):
         tf.summary.scalar("loss", loss)

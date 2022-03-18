@@ -4,7 +4,7 @@ import numpy as np
 import glob
 
 import exr as exr
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import config as conf
 
 import itertools
@@ -152,7 +152,6 @@ def generate(train_input_dir, train_target_dir, train_dataset_dir, tfrecord_file
     scene = item[1][2]
 
     strPathInput = os.path.join(train_input_dir, scene + '_' + corrMethod + '_' + spp)
-    print(strPathInput)
     strPathTarget = os.path.join(train_target_dir, scene)
 
     for fIdx in range(0, totalFrame):
